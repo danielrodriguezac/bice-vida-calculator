@@ -27,27 +27,36 @@ async function main(data) {
     let totalPolicyValue = 0;
     const policyPercentage = parsedData.policy.company_percentage / 100;
     parsedData.policy.workers.forEach((worker, wIndex) => {
-        console.log(worker);
+        // console.log(worker);
         let childrenFactor;
         if (isNaN(parseInt(worker.childs))) {
             console.log('nan found, seting "childs" to zero for worker on index: ' + wIndex);
             worker.childs = 0;
         }
-        if (parseInt(worker.childs) > 2) {
-            childrenFactor = 2;
+        let workerCost;
+        if (parseInt(worker.age) >= 65) {
+            workerCost = 0; 
         } else {
-            childrenFactor = parseInt(worker.childs);
+            if (parseInt(worker.childs) > 2) {
+                childrenFactor = 2;
+            } else {
+                childrenFactor = parseInt(worker.childs);
+            }
+            workerCost = rates.life[childrenFactor];
+            // console.log(rates.life[childrenFactor]);
+            if (parsedData.policy.has_dental_care) {
+                workerCost += rates.dental[childrenFactor]
+            }
         }
-        let workerCost = rates.life[childrenFactor];
-        // console.log(rates.life[childrenFactor]);
-        if (parsedData.policy.has_dental_care) {
-            workerCost += rates.dental[childrenFactor]
-        }
-        console.log(workerCost);
+
+        console.log(`Cost for worker at index(${wIndex}): ${workerCost}`);
         totalPolicyValue += workerCost;
         worker.copay = workerCost - workerCost * policyPercentage;
+        worker.copayToFixed = worker.copay.toFixed(5);
     });
     parsedData.policy.totalCost = totalPolicyValue;
+    parsedData.policy.totalCostToFixed = parsedData.policy.totalCost.toFixed(5);
+    parsedData.message = `Processed ${new Date().toISOString()}`;
     console.log(JSON.stringify(parsedData, null, 4));
 }
 console.log('Requesting data from server');
