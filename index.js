@@ -58,6 +58,7 @@ async function main(data) {
     parsedData.policy.totalCostToFixed = parsedData.policy.totalCost.toFixed(5);
     parsedData.message = `Processed ${new Date().toISOString()}`;
     console.log(JSON.stringify(parsedData, null, 4));
+    console.log(`\n\n\nCosto total de la poliza: ${parsedData.policy.totalCostToFixed}\nFavor revisar el objeto serializado para obtener los copagos por trabajador\n\n`);
 }
 console.log('Requesting data from server');
 https.get('https://dn8mlk7hdujby.cloudfront.net/interview/insurance/policy', (response) => {
